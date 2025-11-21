@@ -20,7 +20,6 @@ model User {
   password      String
   name          String?
   image         String?
-  role          Role      @default(USER)
   status        UserStatus @default(ACTIVE)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -28,9 +27,9 @@ model User {
   // Relations
   sessions      Session[]
   accounts      Account[]
+  userRoles     UserRole[]
   
   @@index([email])
-  @@index([role])
   @@index([status])
   @@map("users")
 }
@@ -79,14 +78,79 @@ model VerificationToken {
 }
 
 // ============================================================================
-// Enums
+// RBAC (Role-Based Access Control) Models
 // ============================================================================
 
-enum Role {
-  USER
-  ADMIN
-  SUPER_ADMIN
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  userRoles        UserRole[]
+  rolePermissions  RolePermission[]
+  
+  @@index([name])
+  @@index([isSystem])
+  @@map("roles")
 }
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  resource    String
+  action      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  rolePermissions RolePermission[]
+  
+  @@unique([resource, action])
+  @@index([resource])
+  @@index([action])
+  @@map("permissions")
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+model RolePermission {
+  id           String   @id @default(cuid())
+  roleId       String
+  permissionId String
+  createdAt    DateTime @default(now())
+  
+  // Relations
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+// ============================================================================
+// Enums
+// ============================================================================
 
 enum UserStatus {
   ACTIVE

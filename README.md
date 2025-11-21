@@ -22,7 +22,12 @@ A production-ready, enterprise-grade admin dashboard starter built with **Next.j
 ### 🔐 Authentication & Security
 - **NextAuth.js v5** for secure authentication
 - **Password hashing** with bcrypt (configurable salt rounds)
-- **Role-Based Access Control (RBAC)** with USER, ADMIN, and SUPER_ADMIN roles
+- **Configurable RBAC System** with fine-grained permissions
+  - Multi-role support per user
+  - Permission-based authorization (`resource:action` format)
+  - Pre-defined system roles (SUPER_ADMIN, ADMIN, USER)
+  - Custom roles and permissions at runtime
+  - Middleware and guards for API protection
 - **Email verification** support
 - **Session management** with secure cookies
 - **Type-safe environment variables** with validation

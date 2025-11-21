@@ -1,12 +1,7 @@
 import { Email } from '../value-objects/email';
 import { Password } from '../value-objects/password';
+import { Role } from './role.entity';
 import { ValidationError, InvalidOperationError } from '../errors/domain-error';
-
-export enum UserRole {
-  USER = 'USER',
-  ADMIN = 'ADMIN',
-  SUPER_ADMIN = 'SUPER_ADMIN',
-}
 
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
@@ -20,7 +15,7 @@ export interface UserProps {
   password: Password;
   name: string | null;
   image: string | null;
-  role: UserRole;
+  roles: Role[];
   status: UserStatus;
   emailVerified: Date | null;
   createdAt: Date;
@@ -43,11 +38,14 @@ export class User {
    * @param props - User properties
    * @returns User instance
    */
-  static create(props: Omit<UserProps, 'id' | 'createdAt' | 'updatedAt'>): User {
+  static create(
+    props: Omit<UserProps, 'id' | 'createdAt' | 'updatedAt' | 'roles'> & { roles?: Role[] }
+  ): User {
     const now = new Date();
 
     return new User({
       ...props,
+      roles: props.roles || [],
       id: '', // Will be set by repository
       createdAt: now,
       updatedAt: now,
@@ -87,8 +85,8 @@ export class User {
     return this.props.image;
   }
 
-  get role(): UserRole {
-    return this.props.role;
+  get roles(): Role[] {
+    return [...this.props.roles]; // Return copy to prevent external modification
   }
 
   get status(): UserStatus {
@@ -148,16 +146,119 @@ export class User {
   }
 
   /**
-   * Changes user role
-   * @param role - New role
+   * Assigns a role to the user
+   * @param role - Role to assign
    */
-  changeRole(role: UserRole): void {
-    if (this.props.role === role) {
+  assignRole(role: Role): void {
+    // Check if user already has this role
+    if (this.hasRole(role.name)) {
       return;
     }
 
-    this.props.role = role;
+    this.props.roles.push(role);
     this.touch();
+  }
+
+  /**
+   * Assigns multiple roles to the user
+   * @param roles - Roles to assign
+   */
+  assignRoles(roles: Role[]): void {
+    roles.forEach((role) => this.assignRole(role));
+  }
+
+  /**
+   * Removes a role from the user
+   * @param roleId - Role ID to remove
+   */
+  removeRole(roleId: string): void {
+    this.props.roles = this.props.roles.filter((r) => r.id !== roleId);
+    this.touch();
+  }
+
+  /**
+   * Replaces all roles with new set
+   * @param roles - New set of roles
+   */
+  setRoles(roles: Role[]): void {
+    this.props.roles = [...roles];
+    this.touch();
+  }
+
+  /**
+   * Checks if user has a specific role
+   * @param roleName - Role name
+   * @returns true if user has the role
+   */
+  hasRole(roleName: string): boolean {
+    return this.props.roles.some((r) => r.name === roleName);
+  }
+
+  /**
+   * Checks if user has any of the specified roles
+   * @param roleNames - Array of role names
+   * @returns true if user has at least one role
+   */
+  hasAnyRole(roleNames: string[]): boolean {
+    return roleNames.some((rn) => this.hasRole(rn));
+  }
+
+  /**
+   * Checks if user has all of the specified roles
+   * @param roleNames - Array of role names
+   * @returns true if user has all roles
+   */
+  hasAllRoles(roleNames: string[]): boolean {
+    return roleNames.every((rn) => this.hasRole(rn));
+  }
+
+  /**
+   * Checks if user has a specific permission
+   * @param permissionString - Permission in format "resource:action"
+   * @returns true if user has the permission through any of their roles
+   */
+  hasPermission(permissionString: string): boolean {
+    return this.props.roles.some((role) => role.hasPermission(permissionString));
+  }
+
+  /**
+   * Checks if user has any of the specified permissions
+   * @param permissionStrings - Array of permission strings
+   * @returns true if user has at least one permission
+   */
+  hasAnyPermission(permissionStrings: string[]): boolean {
+    return permissionStrings.some((ps) => this.hasPermission(ps));
+  }
+
+  /**
+   * Checks if user has all of the specified permissions
+   * @param permissionStrings - Array of permission strings
+   * @returns true if user has all permissions
+   */
+  hasAllPermissions(permissionStrings: string[]): boolean {
+    return permissionStrings.every((ps) => this.hasPermission(ps));
+  }
+
+  /**
+   * Gets all permissions for this user from all their roles
+   * @returns Array of unique permission strings
+   */
+  getAllPermissions(): string[] {
+    const permissions = new Set<string>();
+
+    this.props.roles.forEach((role) => {
+      role.getPermissionStrings().forEach((p) => permissions.add(p));
+    });
+
+    return Array.from(permissions);
+  }
+
+  /**
+   * Gets all role names for this user
+   * @returns Array of role names
+   */
+  getRoleNames(): string[] {
+    return this.props.roles.map((r) => r.name);
   }
 
   /**
@@ -218,17 +319,17 @@ export class User {
   }
 
   /**
-   * Checks if user is admin
+   * Checks if user is admin (has ADMIN or SUPER_ADMIN role)
    */
   isAdmin(): boolean {
-    return this.props.role === UserRole.ADMIN || this.props.role === UserRole.SUPER_ADMIN;
+    return this.hasAnyRole(['ADMIN', 'SUPER_ADMIN']);
   }
 
   /**
    * Checks if user is super admin
    */
   isSuperAdmin(): boolean {
-    return this.props.role === UserRole.SUPER_ADMIN;
+    return this.hasRole('SUPER_ADMIN');
   }
 
   /**
@@ -262,7 +363,6 @@ export class User {
     password: string;
     name: string | null;
     image: string | null;
-    role: UserRole;
     status: UserStatus;
     emailVerified: Date | null;
     createdAt: Date;
@@ -274,7 +374,6 @@ export class User {
       password: this.props.password.getValue(),
       name: this.props.name,
       image: this.props.image,
-      role: this.props.role,
       status: this.props.status,
       emailVerified: this.props.emailVerified,
       createdAt: this.props.createdAt,

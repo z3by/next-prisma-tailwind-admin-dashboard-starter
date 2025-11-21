@@ -1,16 +1,21 @@
 import { IUserRepository } from '@/core/domain/repositories/user.repository.interface';
-import { User, UserRole, UserStatus } from '@/core/domain/entities/user.entity';
+import { IRoleRepository } from '@/core/domain/repositories/role.repository.interface';
+import { User, UserStatus } from '@/core/domain/entities/user.entity';
 import { Email } from '@/core/domain/value-objects/email';
 import { Password } from '@/core/domain/value-objects/password';
-import { ConflictError } from '@/core/domain/errors/domain-error';
+import { ConflictError, NotFoundError } from '@/core/domain/errors/domain-error';
 import { CreateUserDto, UserResponseDto } from '../dtos/user.dto';
+import { SYSTEM_ROLES } from '@/lib/constants/rbac.constants';
 
 /**
  * Create User Use Case
  * Handles the business logic for creating a new user
  */
 export class CreateUserUseCase {
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(
+    private readonly userRepository: IUserRepository,
+    private readonly roleRepository: IRoleRepository
+  ) {}
 
   /**
    * Executes the create user use case
@@ -30,13 +35,34 @@ export class CreateUserUseCase {
       throw new ConflictError('Email already exists');
     }
 
+    // Get roles (default to USER role if not specified)
+    const roles: import('@/core/domain/entities/role.entity').Role[] = [];
+    if (dto.roleIds && dto.roleIds.length > 0) {
+      const fetchedRoles = await Promise.all(
+        dto.roleIds.map(async (roleId) => {
+          const role = await this.roleRepository.findById(roleId);
+          if (!role) {
+            throw new NotFoundError('Role', roleId);
+          }
+          return role;
+        })
+      );
+      roles.push(...fetchedRoles);
+    } else {
+      // Assign default USER role
+      const defaultRole = await this.roleRepository.findByName(SYSTEM_ROLES.USER);
+      if (defaultRole) {
+        roles.push(defaultRole);
+      }
+    }
+
     // Create user entity
     const user = User.create({
       email,
       password,
       name: dto.name || null,
       image: null,
-      role: dto.role || UserRole.USER,
+      roles,
       status: UserStatus.ACTIVE,
       emailVerified: null,
     });
@@ -57,7 +83,8 @@ export class CreateUserUseCase {
       email: user.email.getValue(),
       name: user.name,
       image: user.image,
-      role: user.role,
+      roles: user.getRoleNames(),
+      permissions: user.getAllPermissions(),
       status: user.status,
       emailVerified: user.emailVerified,
       createdAt: user.createdAt,

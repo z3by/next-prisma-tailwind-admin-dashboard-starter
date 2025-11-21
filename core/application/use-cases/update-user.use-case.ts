@@ -1,4 +1,5 @@
 import { IUserRepository } from '@/core/domain/repositories/user.repository.interface';
+import { IRoleRepository } from '@/core/domain/repositories/role.repository.interface';
 import { User } from '@/core/domain/entities/user.entity';
 import { NotFoundError } from '@/core/domain/errors/domain-error';
 import { UpdateUserDto, UserResponseDto } from '../dtos/user.dto';
@@ -8,7 +9,10 @@ import { UpdateUserDto, UserResponseDto } from '../dtos/user.dto';
  * Updates user information
  */
 export class UpdateUserUseCase {
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(
+    private readonly userRepository: IUserRepository,
+    private readonly roleRepository: IRoleRepository
+  ) {}
 
   /**
    * Executes the update user use case
@@ -30,9 +34,21 @@ export class UpdateUserUseCase {
       user.updateProfile(dto.name ?? user.name, dto.image ?? user.image);
     }
 
-    // Update role if provided
-    if (dto.role !== undefined) {
-      user.changeRole(dto.role);
+    // Update roles if provided
+    if (dto.roleIds !== undefined) {
+      const roles = await Promise.all(
+        dto.roleIds.map(async (roleId) => {
+          const role = await this.roleRepository.findById(roleId);
+          if (!role) {
+            throw new NotFoundError('Role', roleId);
+          }
+          return role;
+        })
+      );
+      user.setRoles(roles);
+      
+      // Update roles in database
+      await this.roleRepository.setUserRoles(userId, dto.roleIds);
     }
 
     // Update status if provided
@@ -61,7 +77,8 @@ export class UpdateUserUseCase {
       email: user.email.getValue(),
       name: user.name,
       image: user.image,
-      role: user.role,
+      roles: user.getRoleNames(),
+      permissions: user.getAllPermissions(),
       status: user.status,
       emailVerified: user.emailVerified,
       createdAt: user.createdAt,

@@ -1,4 +1,4 @@
-import { UserRole, UserStatus } from '@/core/domain/entities/user.entity';
+import { UserStatus } from '@/core/domain/entities/user.entity';
 
 /**
  * Create User DTO
@@ -8,7 +8,7 @@ export interface CreateUserDto {
   email: string;
   password: string;
   name?: string;
-  role?: UserRole;
+  roleIds?: string[];
 }
 
 /**
@@ -18,7 +18,7 @@ export interface CreateUserDto {
 export interface UpdateUserDto {
   name?: string | null;
   image?: string | null;
-  role?: UserRole;
+  roleIds?: string[];
   status?: UserStatus;
 }
 
@@ -31,7 +31,8 @@ export interface UserResponseDto {
   email: string;
   name: string | null;
   image: string | null;
-  role: UserRole;
+  roles: string[]; // Array of role names
+  permissions: string[]; // Array of permission strings
   status: UserStatus;
   emailVerified: Date | null;
   createdAt: Date;
