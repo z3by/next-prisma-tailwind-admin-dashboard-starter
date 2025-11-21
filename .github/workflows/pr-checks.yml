@@ -1,0 +1,103 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-info:
+    name: PR Information
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get PR info
+        run: |
+          echo "PR Title: ${{ github.event.pull_request.title }}"
+          echo "PR Author: ${{ github.event.pull_request.user.login }}"
+          echo "Base Branch: ${{ github.event.pull_request.base.ref }}"
+          echo "Head Branch: ${{ github.event.pull_request.head.ref }}"
+
+      - name: Check PR title
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+
+          # Check if PR title follows conventional commits format
+          if echo "$PR_TITLE" | grep -qE '^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\(.+\))?: .+'; then
+            echo "✅ PR title follows conventional commits format"
+          else
+            echo "⚠️  PR title should follow conventional commits format"
+            echo "Examples: feat: add user authentication"
+            echo "          fix: resolve login issue"
+            echo "          docs: update README"
+          fi
+
+      - name: Check PR size
+        run: |
+          FILES_CHANGED=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD | wc -l)
+          LINES_CHANGED=$(git diff --shortstat origin/${{ github.event.pull_request.base.ref }}...HEAD | awk '{print $4+$6}')
+
+          echo "Files changed: $FILES_CHANGED"
+          echo "Lines changed: $LINES_CHANGED"
+
+          if [ "$FILES_CHANGED" -gt 50 ]; then
+            echo "⚠️  Large PR detected (>50 files). Consider breaking it down."
+          fi
+
+          if [ "$LINES_CHANGED" -gt 1000 ]; then
+            echo "⚠️  Large PR detected (>1000 lines). Consider breaking it down."
+          fi
+
+  lint-commits:
+    name: Lint Commit Messages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commit messages
+        run: |
+          echo "Checking commit messages..."
+
+          # Get commits in this PR
+          git log origin/${{ github.event.pull_request.base.ref }}..HEAD --pretty=format:"%s" | while read commit; do
+            echo "Checking: $commit"
+            
+            # Check if commit follows conventional commits (loosely)
+            if echo "$commit" | grep -qE '^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert|wip|merge)'; then
+              echo "  ✅ Good"
+            else
+              echo "  ℹ️  Consider using conventional commits format"
+            fi
+          done
+
+  dependency-check:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check for package-lock.json changes
+        run: |
+          if git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD | grep -q "package-lock.json"; then
+            echo "📦 package-lock.json has been modified"
+            echo "Please make sure this is intentional and all team members update their dependencies"
+          fi
+
+      - name: Check for dependency vulnerabilities
+        run: |
+          npm audit --audit-level=high || echo "⚠️  Vulnerabilities detected. Please review and address if possible."

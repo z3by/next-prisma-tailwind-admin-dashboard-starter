@@ -46,7 +46,7 @@ export class UpdateUserUseCase {
         })
       );
       user.setRoles(roles);
-      
+
       // Update roles in database
       await this.roleRepository.setUserRoles(userId, dto.roleIds);
     }
@@ -86,4 +86,3 @@ export class UpdateUserUseCase {
     };
   }
 }
-

@@ -52,12 +52,12 @@ export interface AuthorizationConfig {
  */
 export type AuthorizedRouteHandler = (
   request: NextRequest,
-  context: { params?: any; user: User }
+  context: { params?: Record<string, string>; user: User }
 ) => Promise<Response> | Response;
 
 /**
  * Higher-order function to protect API routes with authorization
- * 
+ *
  * @example
  * ```typescript
  * export const POST = withAuthorization(
@@ -70,7 +70,7 @@ export type AuthorizedRouteHandler = (
  *   }
  * );
  * ```
- * 
+ *
  * @example
  * ```typescript
  * export const DELETE = withAuthorization(
@@ -87,13 +87,13 @@ export type AuthorizedRouteHandler = (
 export function withAuthorization(
   handler: AuthorizedRouteHandler,
   config: AuthorizationConfig = {}
-): (request: NextRequest, context?: any) => Promise<Response> {
-  return async (request: NextRequest, context?: any) => {
+): (request: NextRequest, context?: { params?: Record<string, string> }) => Promise<Response> {
+  return async (request: NextRequest, context?: { params?: Record<string, string> }) => {
     try {
       // TODO: Get user from session (integrate with NextAuth)
       // For now, we'll assume user is in request context
       // In practice, this would be extracted from session/token
-      const user = (request as any).user as User | null;
+      const user = (request as unknown as { user?: User }).user as User | null;
 
       if (!user) {
         return NextResponse.json(
@@ -144,9 +144,7 @@ export function withAuthorization(
       if (config.customCheck) {
         const result = await config.customCheck(user);
         if (!result) {
-          throw new UnauthorizedError(
-            config.errorMessage || 'Custom authorization check failed'
-          );
+          throw new UnauthorizedError(config.errorMessage || 'Custom authorization check failed');
         }
       }
 
@@ -173,55 +171,64 @@ export function withAuthorization(
  * Shorthand for requiring specific permission
  */
 export function requirePermissionMiddleware(permission: string) {
-  return withAuthorization(() => {
-    return NextResponse.next();
-  }, { permission });
+  return withAuthorization(
+    () => {
+      return NextResponse.next();
+    },
+    { permission }
+  );
 }
 
 /**
  * Shorthand for requiring admin role
  */
 export function requireAdminMiddleware() {
-  return withAuthorization(() => {
-    return NextResponse.next();
-  }, { requireAdmin: true });
+  return withAuthorization(
+    () => {
+      return NextResponse.next();
+    },
+    { requireAdmin: true }
+  );
 }
 
 /**
  * Shorthand for requiring super admin role
  */
 export function requireSuperAdminMiddleware() {
-  return withAuthorization(() => {
-    return NextResponse.next();
-  }, { requireSuperAdmin: true });
+  return withAuthorization(
+    () => {
+      return NextResponse.next();
+    },
+    { requireSuperAdmin: true }
+  );
 }
 
 /**
  * Example usage in API route:
- * 
+ *
  * ```typescript
  * // app/api/users/route.ts
  * import { withAuthorization } from '@/lib/auth/with-authorization';
  * import { PERMISSIONS } from '@/lib/constants/rbac.constants';
- * 
+ *
  * export const POST = withAuthorization(
  *   async (request, { user }) => {
  *     // Your handler logic here
  *     const body = await request.json();
- *     
+ *
  *     // Create user logic
- *     
+ *
  *     return NextResponse.json({ success: true });
  *   },
  *   {
  *     permission: PERMISSIONS.USERS_CREATE,
  *   }
  * );
- * 
+ *
  * export const GET = withAuthorization(
  *   async (request, { user }) => {
  *     // List users logic
- *     
+ *
  *     return NextResponse.json({ users: [] });
  *   },
  *   {
@@ -230,4 +237,3 @@ export function requireSuperAdminMiddleware() {
  * );
  * ```
  */
-

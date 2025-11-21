@@ -5,6 +5,7 @@ import { Permission } from '@/core/domain/entities/permission.entity';
 import { Email } from '@/core/domain/value-objects/email';
 import { Password } from '@/core/domain/value-objects/password';
 import { prisma } from '../database/prisma';
+import { PrismaUserWithRoles } from '@/types/prisma.types';
 
 /**
  * Prisma User Repository Implementation
@@ -23,11 +24,14 @@ export class PrismaUserRepository implements IUserRepository {
         image: data.image,
         status: data.status,
         emailVerified: data.emailVerified,
-        userRoles: roleIds.length > 0 ? {
-          create: roleIds.map((roleId) => ({
-            roleId,
-          })),
-        } : undefined,
+        userRoles:
+          roleIds.length > 0
+            ? {
+                create: roleIds.map((roleId) => ({
+                  roleId,
+                })),
+              }
+            : undefined,
       },
       include: {
         userRoles: {
@@ -184,9 +188,9 @@ export class PrismaUserRepository implements IUserRepository {
   /**
    * Converts Prisma model to Domain entity
    */
-  private toDomain(prismaUser: any): User {
-    const roles = (prismaUser.userRoles || []).map((ur: any) => {
-      const permissions = (ur.role.rolePermissions || []).map((rp: any) =>
+  private toDomain(prismaUser: PrismaUserWithRoles): User {
+    const roles = (prismaUser.userRoles || []).map((ur) => {
+      const permissions = (ur.role.rolePermissions || []).map((rp) =>
         Permission.fromPersistence({
           id: rp.permission.id,
           name: rp.permission.name,
@@ -223,4 +227,3 @@ export class PrismaUserRepository implements IUserRepository {
     });
   }
 }
-

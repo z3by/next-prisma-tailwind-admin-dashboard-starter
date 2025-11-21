@@ -27,9 +27,7 @@ export class Permission {
    * @param props - Permission properties
    * @returns Permission instance
    */
-  static create(
-    props: Omit<PermissionProps, 'id' | 'createdAt' | 'updatedAt'>
-  ): Permission {
+  static create(props: Omit<PermissionProps, 'id' | 'createdAt' | 'updatedAt'>): Permission {
     this.validate(props);
 
     const now = new Date();
@@ -54,9 +52,7 @@ export class Permission {
   /**
    * Validates permission properties
    */
-  private static validate(
-    props: Omit<PermissionProps, 'id' | 'createdAt' | 'updatedAt'>
-  ): void {
+  private static validate(props: Omit<PermissionProps, 'id' | 'createdAt' | 'updatedAt'>): void {
     if (!props.name || props.name.trim().length === 0) {
       throw new ValidationError('Permission name is required');
     }
@@ -184,4 +180,3 @@ export class Permission {
     };
   }
 }
-

@@ -68,13 +68,13 @@ export const ERROR_MESSAGES = {
   ACCOUNT_INACTIVE: 'Your account is inactive',
   EMAIL_NOT_VERIFIED: 'Please verify your email address',
   UNAUTHORIZED: 'You are not authorized to perform this action',
-  
+
   // User
   USER_NOT_FOUND: 'User not found',
   EMAIL_EXISTS: 'Email already exists',
   INVALID_EMAIL: 'Invalid email address',
   INVALID_PASSWORD: 'Invalid password',
-  
+
   // General
   INTERNAL_ERROR: 'An internal error occurred',
   VALIDATION_ERROR: 'Validation error',
@@ -119,4 +119,3 @@ export const ROUTES = {
 
 export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
 export type UserStatus = (typeof USER_STATUS)[keyof typeof USER_STATUS];
-

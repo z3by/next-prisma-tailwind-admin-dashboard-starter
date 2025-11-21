@@ -12,12 +12,14 @@ A comprehensive, configurable Role-Based Access Control (RBAC) system has been s
 ### 1. Domain Layer Entities
 
 **Permission Entity** (`core/domain/entities/permission.entity.ts`)
+
 - Represents individual permissions in format `resource:action`
 - Validation for resource and action names
 - Methods for matching permission strings
 - Immutable properties with business logic
 
 **Role Entity** (`core/domain/entities/role.entity.ts`)
+
 - Collection of permissions
 - Support for system roles (non-deletable)
 - Methods to add/remove/check permissions
@@ -25,6 +27,7 @@ A comprehensive, configurable Role-Based Access Control (RBAC) system has been s
 - Gets permissions grouped by resource
 
 **User Entity Updates** (`core/domain/entities/user.entity.ts`)
+
 - Changed from single role to multiple roles
 - Removed `UserRole` enum in favor of database-backed roles
 - New methods:
@@ -37,17 +40,20 @@ A comprehensive, configurable Role-Based Access Control (RBAC) system has been s
 ### 2. Database Schema
 
 **New Tables** (Prisma Schema)
+
 - `roles` - Role definitions with system role flag
 - `permissions` - Permission definitions with resource and action
 - `user_roles` - Many-to-many link between users and roles
 - `role_permissions` - Many-to-many link between roles and permissions
 
 **Relationships**:
+
 ```
 Users ↔ UserRoles ↔ Roles ↔ RolePermissions ↔ Permissions
 ```
 
 **Key Features**:
+
 - Unique constraints on role names
 - Unique constraints on (resource, action) for permissions
 - Unique constraints preventing duplicate assignments
@@ -57,6 +63,7 @@ Users ↔ UserRoles ↔ Roles ↔ RolePermissions ↔ Permissions
 ### 3. Repository Interfaces & Implementations
 
 **Permission Repository** (`core/domain/repositories/permission.repository.interface.ts`)
+
 - Full CRUD operations
 - Find by resource and action
 - Find by role ID or user ID
@@ -64,6 +71,7 @@ Users ↔ UserRoles ↔ Roles ↔ RolePermissions ↔ Permissions
 - Check permission existence
 
 **Role Repository** (`core/domain/repositories/role.repository.interface.ts`)
+
 - Full CRUD operations
 - Find by name
 - Find roles by user ID
@@ -72,6 +80,7 @@ Users ↔ UserRoles ↔ Roles ↔ RolePermissions ↔ Permissions
 - Check role name existence
 
 **Prisma Implementations**:
+
 - `PrismaPermissionRepository` - Complete implementation with Prisma
 - `PrismaRoleRepository` - Complete implementation with Prisma
 - `PrismaUserRepository` - Updated to load roles and permissions
@@ -79,6 +88,7 @@ Users ↔ UserRoles ↔ Roles ↔ RolePermissions ↔ Permissions
 ### 4. Constants & Configuration
 
 **RBAC Constants** (`lib/constants/rbac.constants.ts`)
+
 - System roles: `SUPER_ADMIN`, `ADMIN`, `USER`
 - Resources: users, roles, permissions, posts, comments, etc.
 - Actions: create, read, update, delete, manage, list, etc.
@@ -90,6 +100,7 @@ Users ↔ UserRoles ↔ Roles ↔ RolePermissions ↔ Permissions
 ### 5. Validation Schemas
 
 **RBAC Validation** (`lib/validations/rbac.schema.ts`)
+
 - Permission creation and update schemas
 - Role creation and update schemas
 - Role-permission assignment schemas
@@ -101,6 +112,7 @@ Users ↔ UserRoles ↔ Roles ↔ RolePermissions ↔ Permissions
 ### 6. Authorization System
 
 **Authorization Guards** (`lib/auth/authorization.ts`)
+
 - `requirePermission()` - Require specific permission
 - `requireAnyPermission()` - Require at least one permission
 - `requireAllPermissions()` - Require all permissions
@@ -115,6 +127,7 @@ Users ↔ UserRoles ↔ Roles ↔ RolePermissions ↔ Permissions
 - Boolean versions: `hasPermission()`, `hasRole()`, etc.
 
 **API Middleware** (`lib/auth/with-authorization.ts`)
+
 - `withAuthorization()` HOF for protecting API routes
 - Configuration options:
   - Single or multiple permissions
@@ -127,6 +140,7 @@ Users ↔ UserRoles ↔ Roles ↔ RolePermissions ↔ Permissions
 ### 7. Application Layer Updates
 
 **Updated Use Cases**:
+
 - `CreateUserUseCase` - Now accepts role IDs, defaults to USER role
 - `UpdateUserUseCase` - Can update user roles
 - `GetUserUseCase` - Returns roles and permissions in response
@@ -134,6 +148,7 @@ Users ↔ UserRoles ↔ Roles ↔ RolePermissions ↔ Permissions
 - `DeleteUserUseCase` - No changes needed
 
 **Updated DTOs** (`core/application/dtos/user.dto.ts`)
+
 - `CreateUserDto` - Added `roleIds?: string[]`
 - `UpdateUserDto` - Added `roleIds?: string[]`
 - `UserResponseDto` - Added `roles: string[]` and `permissions: string[]`
@@ -141,6 +156,7 @@ Users ↔ UserRoles ↔ Roles ↔ RolePermissions ↔ Permissions
 ### 8. Documentation
 
 **RBAC Guide** (`docs/RBAC_GUIDE.md`)
+
 - Complete 400+ line guide
 - Core concepts explanation
 - Database schema overview
@@ -169,14 +185,16 @@ Users ↔ UserRoles ↔ Roles ↔ RolePermissions ↔ Permissions
 ## 🔑 Key Features
 
 ### Permission Format
+
 ```typescript
 // Format: resource:action
-"users:create"    // Can create users
-"posts:manage"    // Full control over posts
-"analytics:view"  // Can view analytics
+'users:create'; // Can create users
+'posts:manage'; // Full control over posts
+'analytics:view'; // Can view analytics
 ```
 
 ### Multi-Role Support
+
 ```typescript
 // Users can have multiple roles
 user.assignRoles([adminRole, editorRole]);
@@ -186,6 +204,7 @@ user.hasPermission('users:create'); // true if any role has it
 ```
 
 ### API Protection
+
 ```typescript
 // Protect routes with middleware
 export const POST = withAuthorization(
@@ -200,14 +219,16 @@ export const POST = withAuthorization(
 ```
 
 ### Flexible Authorization
+
 ```typescript
 // Multiple ways to check authorization
-requirePermission(user, 'users:create');      // Throws if unauthorized
-hasPermission(user, 'users:create');          // Returns boolean
+requirePermission(user, 'users:create'); // Throws if unauthorized
+hasPermission(user, 'users:create'); // Returns boolean
 requireOwnershipOrPermission(user, ownerId, permission); // Ownership check
 ```
 
 ### System Roles
+
 - **SUPER_ADMIN**: Full access (all permissions)
 - **ADMIN**: User and content management
 - **USER**: Basic user permissions
@@ -257,7 +278,7 @@ import { hasPermission } from '@/lib/auth/authorization';
 
 function UserList({ user }: { user: User }) {
   const canCreate = hasPermission(user, PERMISSIONS.USERS_CREATE);
-  
+
   return (
     <div>
       {canCreate && <button>Create User</button>}
@@ -304,17 +325,20 @@ await roleRepository.save(accountantRole);
 ## 🚀 Next Steps
 
 ### Immediate
+
 1. Create database migration: `npm run db:migrate`
 2. Seed default roles and permissions
 3. Assign roles to existing users
 
 ### Short-Term
+
 - Create admin UI for role management
 - Create admin UI for permission management
 - Implement audit logging for permission changes
 - Add permission caching for performance
 
 ### Long-Term
+
 - Dynamic permission loading from config
 - Permission templates for common roles
 - Permission inheritance/hierarchies
@@ -323,6 +347,7 @@ await roleRepository.save(accountantRole);
 ## 📁 Files Created/Modified
 
 ### Created
+
 - `core/domain/entities/permission.entity.ts`
 - `core/domain/entities/role.entity.ts`
 - `core/domain/repositories/permission.repository.interface.ts`
@@ -337,6 +362,7 @@ await roleRepository.save(accountantRole);
 - `docs/RBAC_IMPLEMENTATION_SUMMARY.md` (this file)
 
 ### Modified
+
 - `prisma/schema.prisma` - Added RBAC tables
 - `core/domain/entities/user.entity.ts` - Multi-role support
 - `core/infrastructure/repositories/prisma-user.repository.ts` - Load roles
@@ -360,6 +386,7 @@ await roleRepository.save(accountantRole);
 **Status**: ✅ RBAC System Fully Implemented and Production-Ready
 
 The configurable RBAC system is complete with:
+
 - Domain entities and business logic
 - Database schema and repositories
 - Authorization guards and middleware
@@ -367,4 +394,3 @@ The configurable RBAC system is complete with:
 - Comprehensive documentation
 
 Ready for use in production applications!
-

@@ -93,4 +93,3 @@ export interface IRoleRepository {
    */
   setUserRoles(userId: string, roleIds: string[]): Promise<void>;
 }
-

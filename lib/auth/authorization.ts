@@ -343,4 +343,3 @@ export function requireOwnershipOrAdmin(user: User | null, resourceOwnerId: stri
 
   throw new UnauthorizedError('Access denied to this resource');
 }
-

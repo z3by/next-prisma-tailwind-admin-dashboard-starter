@@ -21,7 +21,7 @@
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset",
-    "prepare": "husky install",
+    "prepare": "husky",
     "check": "npm run format:check && npm run lint && npm run type-check"
   },
   "dependencies": {
@@ -67,5 +67,22 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.0.12"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --fix",
+      "bash -c 'tsc --noEmit'"
+    ],
+    "*.{js,jsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,md,mdx,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.prisma": [
+      "prettier --write"
+    ]
   }
 }

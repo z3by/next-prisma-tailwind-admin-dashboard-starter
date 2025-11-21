@@ -245,4 +245,3 @@ export type SystemRole = (typeof SYSTEM_ROLES)[keyof typeof SYSTEM_ROLES];
 export type Resource = (typeof RESOURCES)[keyof typeof RESOURCES];
 export type Action = (typeof ACTIONS)[keyof typeof ACTIONS];
 export type PermissionString = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
-

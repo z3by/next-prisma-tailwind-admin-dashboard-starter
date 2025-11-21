@@ -81,17 +81,28 @@ export class User {
   private props: UserProps;
 
   // Business methods
-  changePassword(newPassword: Password): void { /* ... */ }
-  verifyEmail(): void { /* ... */ }
-  suspend(): void { /* ... */ }
-  
+  changePassword(newPassword: Password): void {
+    /* ... */
+  }
+  verifyEmail(): void {
+    /* ... */
+  }
+  suspend(): void {
+    /* ... */
+  }
+
   // Validation logic
-  isActive(): boolean { /* ... */ }
-  canPerformAdminActions(): boolean { /* ... */ }
+  isActive(): boolean {
+    /* ... */
+  }
+  canPerformAdminActions(): boolean {
+    /* ... */
+  }
 }
 ```
 
 **Key Characteristics:**
+
 - Has unique identifier (`id`)
 - Contains business logic
 - Encapsulates state changes
@@ -124,6 +135,7 @@ export class Email {
 ```
 
 **Key Characteristics:**
+
 - Immutable (cannot be changed after creation)
 - No identity (two emails with same value are equal)
 - Self-validating
@@ -146,6 +158,7 @@ export interface IUserRepository {
 ```
 
 **Key Characteristics:**
+
 - Interface in Domain layer
 - Implementation in Infrastructure layer
 - Hides persistence details
@@ -175,6 +188,7 @@ export class UserCreatedEvent {
 **Purpose**: Contains pure business logic and rules.
 
 **Contents**:
+
 - **Entities** (`entities/`): Business objects with identity
 - **Value Objects** (`value-objects/`): Immutable validated objects
 - **Repository Interfaces** (`repositories/`): Data access contracts
@@ -182,6 +196,7 @@ export class UserCreatedEvent {
 - **Domain Events** (`events/`): Business occurrences
 
 **Rules**:
+
 - ❌ No dependencies on other layers
 - ❌ No framework dependencies
 - ❌ No external library dependencies (except utilities)
@@ -190,6 +205,7 @@ export class UserCreatedEvent {
 - ✅ Fully testable in isolation
 
 **Example Structure**:
+
 ```
 core/domain/
 ├── entities/
@@ -208,11 +224,13 @@ core/domain/
 **Purpose**: Orchestrates domain objects to perform use cases.
 
 **Contents**:
+
 - **Use Cases** (`use-cases/`): Application-specific business rules
 - **DTOs** (`dtos/`): Data transfer objects for boundaries
 - **Ports** (`ports/`): Interfaces for external services
 
 **Rules**:
+
 - ✅ Depends on Domain layer
 - ❌ No direct dependencies on frameworks
 - ✅ Coordinates domain objects
@@ -220,6 +238,7 @@ core/domain/
 - ✅ Transforms data between layers
 
 **Example Structure**:
+
 ```
 core/application/
 ├── use-cases/
@@ -234,6 +253,7 @@ core/application/
 ```
 
 **Use Case Example**:
+
 ```typescript
 export class CreateUserUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
@@ -250,7 +270,7 @@ export class CreateUserUseCase {
     }
 
     // 3. Create entity
-    const user = User.create({ email, password, /* ... */ });
+    const user = User.create({ email, password /* ... */ });
 
     // 4. Persist
     const savedUser = await this.userRepository.save(user);
@@ -266,17 +286,20 @@ export class CreateUserUseCase {
 **Purpose**: Implements technical concerns and external dependencies.
 
 **Contents**:
+
 - **Repository Implementations** (`repositories/`): Concrete data access
 - **Database Setup** (`database/`): Prisma client, connections
 - **External Services** (`services/`): Email, file storage, etc.
 
 **Rules**:
+
 - ✅ Implements Domain interfaces
 - ✅ Contains framework-specific code
 - ✅ Handles technical details
 - ❌ No business logic
 
 **Example Structure**:
+
 ```
 core/infrastructure/
 ├── database/
@@ -288,6 +311,7 @@ core/infrastructure/
 ```
 
 **Repository Implementation Example**:
+
 ```typescript
 export class PrismaUserRepository implements IUserRepository {
   async save(user: User): Promise<User> {
@@ -312,12 +336,14 @@ export class PrismaUserRepository implements IUserRepository {
 **Purpose**: Handles HTTP requests, renders UI, and user interactions.
 
 **Contents**:
+
 - **Pages** (`app/`): Next.js route handlers
 - **API Routes** (`app/api/`): RESTful endpoints
 - **Components** (`components/`): React UI components
 - **Layouts** (`components/layouts/`): Page layouts
 
 **Rules**:
+
 - ✅ Depends on Application layer
 - ✅ Handles HTTP concerns
 - ✅ Validates input
@@ -325,18 +351,19 @@ export class PrismaUserRepository implements IUserRepository {
 - ❌ No business logic
 
 **Example API Route**:
+
 ```typescript
 // app/api/users/route.ts
 export async function POST(request: Request) {
   try {
     // 1. Parse and validate input
     const body = await request.json();
-    
+
     // 2. Call use case
     const userRepository = new PrismaUserRepository();
     const createUser = new CreateUserUseCase(userRepository);
     const user = await createUser.execute(body);
-    
+
     // 3. Return response
     return NextResponse.json(user, { status: 201 });
   } catch (error) {
@@ -422,12 +449,14 @@ UserRepository.save(user)
 **Purpose**: Abstracts data persistence logic.
 
 **Benefits**:
+
 - Database-agnostic domain layer
 - Easy to switch databases
 - Simplifies testing
 - Encapsulates query logic
 
 **Implementation**:
+
 ```typescript
 // Interface (Domain)
 interface IUserRepository {
@@ -436,7 +465,9 @@ interface IUserRepository {
 
 // Implementation (Infrastructure)
 class PrismaUserRepository implements IUserRepository {
-  async save(user: User): Promise<User> { /* ... */ }
+  async save(user: User): Promise<User> {
+    /* ... */
+  }
 }
 ```
 
@@ -445,16 +476,20 @@ class PrismaUserRepository implements IUserRepository {
 **Purpose**: Encapsulates application-specific business rules.
 
 **Benefits**:
+
 - Single responsibility
 - Easy to understand
 - Reusable
 - Testable
 
 **Implementation**:
+
 ```typescript
 class CreateUserUseCase {
   constructor(private repo: IUserRepository) {}
-  async execute(dto: CreateUserDto): Promise<UserResponseDto> { /* ... */ }
+  async execute(dto: CreateUserDto): Promise<UserResponseDto> {
+    /* ... */
+  }
 }
 ```
 
@@ -463,16 +498,18 @@ class CreateUserUseCase {
 **Purpose**: Represents concepts without identity.
 
 **Benefits**:
+
 - Immutability
 - Self-validation
 - Type safety
 - Reusability
 
 **Implementation**:
+
 ```typescript
 class Email {
   private constructor(private value: string) {}
-  
+
   static create(email: string): Email {
     if (!this.isValid(email)) throw new ValidationError();
     return new Email(email.toLowerCase());
@@ -485,12 +522,14 @@ class Email {
 **Purpose**: Transfers data between layers.
 
 **Benefits**:
+
 - Decouples layers
 - Prevents leaking domain models
 - Allows different representations
 - Simplifies serialization
 
 **Implementation**:
+
 ```typescript
 interface CreateUserDto {
   email: string;
@@ -573,9 +612,15 @@ import { NextRequest } from 'next/server'; // Framework dependency
 
 ```typescript
 // ✅ One use case per class
-class CreateUserUseCase { /* ... */ }
-class UpdateUserUseCase { /* ... */ }
-class DeleteUserUseCase { /* ... */ }
+class CreateUserUseCase {
+  /* ... */
+}
+class UpdateUserUseCase {
+  /* ... */
+}
+class DeleteUserUseCase {
+  /* ... */
+}
 
 // ❌ Avoid god classes
 class UserService {
@@ -635,7 +680,9 @@ Test entities and value objects in isolation:
 ```typescript
 describe('User Entity', () => {
   it('should create user with valid data', () => {
-    const user = User.create({ /* valid data */ });
+    const user = User.create({
+      /* valid data */
+    });
     expect(user).toBeDefined();
   });
 
@@ -656,10 +703,12 @@ describe('CreateUserUseCase', () => {
       save: jest.fn(),
       emailExists: jest.fn().mockResolvedValue(false),
     };
-    
+
     const useCase = new CreateUserUseCase(mockRepo);
-    await useCase.execute({ /* data */ });
-    
+    await useCase.execute({
+      /* data */
+    });
+
     expect(mockRepo.save).toHaveBeenCalled();
   });
 });
@@ -673,10 +722,12 @@ Test repositories with real database (integration tests):
 describe('PrismaUserRepository', () => {
   it('should save user to database', async () => {
     const repo = new PrismaUserRepository();
-    const user = User.create({ /* data */ });
-    
+    const user = User.create({
+      /* data */
+    });
+
     const saved = await repo.save(user);
-    
+
     expect(saved.id).toBeDefined();
   });
 });
@@ -694,4 +745,3 @@ This architecture provides:
 - ✅ **Best Practices**: Follows SOLID, DDD, and Clean Architecture principles
 
 By following these principles, the codebase remains clean, maintainable, and adaptable to changing requirements.
-

@@ -2,6 +2,7 @@ import { IRoleRepository } from '@/core/domain/repositories/role.repository.inte
 import { Role } from '@/core/domain/entities/role.entity';
 import { Permission } from '@/core/domain/entities/permission.entity';
 import { prisma } from '../database/prisma';
+import { PrismaRoleWithPermissions } from '@/types/prisma.types';
 
 /**
  * Prisma Role Repository Implementation
@@ -191,8 +192,8 @@ export class PrismaRoleRepository implements IRoleRepository {
   /**
    * Converts Prisma model to Domain entity
    */
-  private toDomain(prismaRole: any): Role {
-    const permissions = prismaRole.rolePermissions.map((rp: any) =>
+  private toDomain(prismaRole: PrismaRoleWithPermissions): Role {
+    const permissions = prismaRole.rolePermissions.map((rp) =>
       Permission.fromPersistence({
         id: rp.permission.id,
         name: rp.permission.name,
@@ -215,4 +216,3 @@ export class PrismaRoleRepository implements IRoleRepository {
     });
   }
 }
-

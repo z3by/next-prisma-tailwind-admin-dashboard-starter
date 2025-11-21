@@ -170,4 +170,3 @@ export type CheckRolesInput = z.infer<typeof checkRolesSchema>;
 
 export type ListRolesQuery = z.infer<typeof listRolesQuerySchema>;
 export type ListPermissionsQuery = z.infer<typeof listPermissionsQuerySchema>;
-

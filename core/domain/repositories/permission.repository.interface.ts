@@ -116,4 +116,3 @@ export interface IPermissionRepository {
    */
   setRolePermissions(roleId: string, permissionIds: string[]): Promise<void>;
 }
-

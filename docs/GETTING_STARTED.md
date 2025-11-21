@@ -105,6 +105,7 @@ npm run db:migrate
 ```
 
 This will:
+
 - Generate the Prisma Client
 - Create all necessary tables in your database
 - Set up the schema
@@ -136,6 +137,7 @@ npm run db:studio
 ```
 
 This opens a browser interface at [http://localhost:5555](http://localhost:5555) where you can:
+
 - View all tables
 - Browse data
 - Add/edit records manually
@@ -157,6 +159,7 @@ npm run check
 ```
 
 This runs:
+
 - Prettier (code formatting check)
 - ESLint (linting)
 - TypeScript (type checking)
@@ -226,6 +229,7 @@ cat docs/ARCHITECTURE.md
 ```
 
 Key concepts:
+
 - **Clean Architecture**: Separation of concerns
 - **Domain-Driven Design**: Business logic in the domain layer
 - **Repository Pattern**: Data access abstraction
@@ -278,6 +282,7 @@ touch app/(dashboard)/profile/page.tsx
 **Problem**: `Can't reach database server`
 
 **Solution**:
+
 1. Check PostgreSQL is running: `pg_isready`
 2. Verify DATABASE_URL in `.env`
 3. Check PostgreSQL logs
@@ -287,6 +292,7 @@ touch app/(dashboard)/profile/page.tsx
 **Problem**: `Port 3000 is already in use`
 
 **Solution**:
+
 ```bash
 # Kill process on port 3000
 lsof -ti:3000 | xargs kill -9
@@ -300,6 +306,7 @@ PORT=3001 npm run dev
 **Problem**: `Cannot find module '@prisma/client'`
 
 **Solution**:
+
 ```bash
 npm run db:generate
 ```
@@ -309,6 +316,7 @@ npm run db:generate
 **Problem**: `Migration failed to apply`
 
 **Solution**:
+
 ```bash
 # Reset database (DANGER: deletes all data)
 npm run db:reset
@@ -323,6 +331,7 @@ npm run db:migrate
 **Problem**: `Type 'X' is not assignable to type 'Y'`
 
 **Solution**:
+
 1. Run `npm run type-check` to see all errors
 2. Check for missing type definitions
 3. Verify import paths are correct
@@ -390,4 +399,3 @@ npm run start
 6. 🧪 **Write Tests**: Add tests for your features
 
 Happy coding! 🚀
-

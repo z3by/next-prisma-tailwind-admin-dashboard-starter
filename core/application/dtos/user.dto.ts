@@ -66,4 +66,3 @@ export interface ListUsersResponseDto {
   limit: number;
   totalPages: number;
 }
-

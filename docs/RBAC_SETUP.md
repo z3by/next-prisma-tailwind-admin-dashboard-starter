@@ -17,6 +17,7 @@ npm run db:migrate
 ```
 
 This will create the following tables:
+
 - `roles`
 - `permissions`
 - `user_roles`
@@ -29,7 +30,11 @@ Create a seed script to populate initial roles and permissions:
 ```typescript
 // prisma/seed.ts
 import { PrismaClient } from '@prisma/client';
-import { PERMISSIONS, SYSTEM_ROLES, DEFAULT_ROLE_PERMISSIONS } from '../lib/constants/rbac.constants';
+import {
+  PERMISSIONS,
+  SYSTEM_ROLES,
+  DEFAULT_ROLE_PERMISSIONS,
+} from '../lib/constants/rbac.constants';
 
 const prisma = new PrismaClient();
 
@@ -38,10 +43,10 @@ async function main() {
 
   // Create all permissions
   const permissionsToCreate = Object.values(PERMISSIONS);
-  
+
   for (const permString of permissionsToCreate) {
     const [resource, action] = permString.split(':');
-    
+
     await prisma.permission.upsert({
       where: { resource_action: { resource, action } },
       update: {},
@@ -217,7 +222,7 @@ export class DeleteUserUseCase {
   async execute(userId: string, currentUser: User): Promise<void> {
     // Check permission
     requirePermission(currentUser, PERMISSIONS.USERS_DELETE);
-    
+
     // Delete logic
     await this.userRepository.delete(userId);
   }
@@ -235,10 +240,10 @@ import { PERMISSIONS } from '@/lib/constants/rbac.constants';
 
 export function UserManagement() {
   const { user } = useUser();
-  
+
   const canCreate = hasPermission(user, PERMISSIONS.USERS_CREATE);
   const canDelete = hasPermission(user, PERMISSIONS.USERS_DELETE);
-  
+
   return (
     <div>
       {canCreate && <CreateUserButton />}
@@ -360,17 +365,17 @@ describe('User permissions', () => {
       resource: 'users',
       action: 'create',
     });
-    
+
     const role = Role.create({
       name: 'ADMIN',
       permissions: [permission],
     });
-    
+
     const user = User.create({
       roles: [role],
       // ... other props
     });
-    
+
     expect(user.hasPermission('users:create')).toBe(true);
   });
 });
@@ -419,4 +424,3 @@ WHERE r.name = 'ADMIN';
 **Need Help?**
 
 Check the comprehensive [RBAC Guide](./RBAC_GUIDE.md) for detailed examples and best practices.
-

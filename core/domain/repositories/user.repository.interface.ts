@@ -63,4 +63,3 @@ export interface IUserRepository {
    */
   emailExists(email: Email, excludeUserId?: string): Promise<boolean>;
 }
-

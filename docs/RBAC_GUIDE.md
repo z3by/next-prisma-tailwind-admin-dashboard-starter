@@ -43,14 +43,15 @@ Permissions are defined in the format **`resource:action`**:
 
 ```typescript
 // Examples
-"users:create"    // Can create users
-"users:read"      // Can read user data
-"users:update"    // Can update users
-"users:delete"    // Can delete users
-"users:manage"    // Full control over users (all CRUD)
+'users:create'; // Can create users
+'users:read'; // Can read user data
+'users:update'; // Can update users
+'users:delete'; // Can delete users
+'users:manage'; // Full control over users (all CRUD)
 ```
 
 **Components:**
+
 - **Resource**: The entity or feature (e.g., `users`, `posts`, `settings`)
 - **Action**: The operation (e.g., `create`, `read`, `update`, `delete`, `manage`)
 
@@ -97,18 +98,22 @@ Permissions
 ### Tables
 
 **roles**
+
 - `id`, `name`, `description`, `isSystem`
 - System roles have `isSystem = true`
 
 **permissions**
+
 - `id`, `name`, `description`, `resource`, `action`
 - Unique constraint on `(resource, action)`
 
 **user_roles**
+
 - Links users to roles
 - Unique constraint on `(userId, roleId)`
 
 **role_permissions**
+
 - Links roles to permissions
 - Unique constraint on `(roleId, permissionId)`
 
@@ -224,9 +229,9 @@ export const POST = withAuthorization(
   async (request, { user }) => {
     // User is guaranteed to have users:create permission
     const body = await request.json();
-    
+
     // Create user logic
-    
+
     return NextResponse.json({ success: true });
   },
   {
@@ -239,7 +244,7 @@ export const GET = withAuthorization(
   async (request, { user }) => {
     // User has either users:list OR users:manage
     // List users logic
-    
+
     return NextResponse.json({ users: [] });
   },
   {
@@ -252,7 +257,7 @@ export const PUT = withAuthorization(
   async (request, { user }) => {
     // User must have both permissions
     // Update logic
-    
+
     return NextResponse.json({ success: true });
   },
   {
@@ -265,7 +270,7 @@ export const DELETE = withAuthorization(
   async (request, { user }) => {
     // User must be ADMIN or SUPER_ADMIN
     // Delete logic
-    
+
     return NextResponse.json({ success: true });
   },
   {
@@ -277,7 +282,7 @@ export const DELETE = withAuthorization(
 export const PATCH = withAuthorization(
   async (request, { user, params }) => {
     // Custom logic passed
-    
+
     return NextResponse.json({ success: true });
   },
   {
@@ -310,26 +315,22 @@ import {
 async function deleteUser(userId: string, currentUser: User) {
   // Require permission (throws if not authorized)
   requirePermission(currentUser, PERMISSIONS.USERS_DELETE);
-  
+
   // Delete logic
 }
 
 // Check ownership or permission
 async function updatePost(postId: string, currentUser: User, post: Post) {
   // User can update if they own it OR have posts:update permission
-  requireOwnershipOrPermission(
-    currentUser,
-    post.authorId,
-    PERMISSIONS.POSTS_UPDATE
-  );
-  
+  requireOwnershipOrPermission(currentUser, post.authorId, PERMISSIONS.POSTS_UPDATE);
+
   // Update logic
 }
 
 // Require admin
 async function viewAnalytics(currentUser: User) {
   requireAdmin(currentUser);
-  
+
   // Show analytics
 }
 ```
@@ -349,17 +350,17 @@ import {
 
 async function getUserProfile(userId: string, currentUser: User) {
   const profile = await getProfile(userId);
-  
+
   // Show sensitive data only if authorized
   if (hasPermission(currentUser, PERMISSIONS.USERS_MANAGE)) {
     profile.sensitiveData = await getSensitiveData(userId);
   }
-  
+
   // Show admin panel if admin
   if (hasAnyRole(currentUser, ['ADMIN', 'SUPER_ADMIN'])) {
     profile.adminPanel = await getAdminPanel();
   }
-  
+
   return profile;
 }
 ```
@@ -456,22 +457,22 @@ import { PERMISSIONS } from '@/lib/constants/rbac.constants';
 
 export function UserManagementPanel() {
   const { user } = useUser();
-  
+
   // Conditional rendering based on permissions
   const canCreateUsers = hasPermission(user, PERMISSIONS.USERS_CREATE);
   const canDeleteUsers = hasPermission(user, PERMISSIONS.USERS_DELETE);
   const isAdmin = hasRole(user, 'ADMIN');
-  
+
   return (
     <div>
       {canCreateUsers && (
         <button>Create User</button>
       )}
-      
+
       {canDeleteUsers && (
         <button>Delete User</button>
       )}
-      
+
       {isAdmin && (
         <div>Admin Panel</div>
       )}
@@ -488,21 +489,21 @@ See `lib/constants/rbac.constants.ts` for all pre-defined permissions:
 
 ```typescript
 // User Management
-PERMISSIONS.USERS_CREATE
-PERMISSIONS.USERS_READ
-PERMISSIONS.USERS_UPDATE
-PERMISSIONS.USERS_DELETE
-PERMISSIONS.USERS_MANAGE
-PERMISSIONS.USERS_LIST
-PERMISSIONS.USERS_EXPORT
+PERMISSIONS.USERS_CREATE;
+PERMISSIONS.USERS_READ;
+PERMISSIONS.USERS_UPDATE;
+PERMISSIONS.USERS_DELETE;
+PERMISSIONS.USERS_MANAGE;
+PERMISSIONS.USERS_LIST;
+PERMISSIONS.USERS_EXPORT;
 
 // Role Management
-PERMISSIONS.ROLES_CREATE
-PERMISSIONS.ROLES_READ
-PERMISSIONS.ROLES_UPDATE
-PERMISSIONS.ROLES_DELETE
-PERMISSIONS.ROLES_MANAGE
-PERMISSIONS.ROLES_LIST
+PERMISSIONS.ROLES_CREATE;
+PERMISSIONS.ROLES_READ;
+PERMISSIONS.ROLES_UPDATE;
+PERMISSIONS.ROLES_DELETE;
+PERMISSIONS.ROLES_MANAGE;
+PERMISSIONS.ROLES_LIST;
 
 // And more...
 ```
@@ -510,16 +511,19 @@ PERMISSIONS.ROLES_LIST
 ### System Roles
 
 **SUPER_ADMIN**
+
 - Full access to everything
 - Cannot be deleted or modified
 
 **ADMIN**
+
 - User management (create, read, update, list, export)
 - Content management (posts, comments)
 - Analytics viewing
 - Report viewing
 
 **USER**
+
 - Own profile management
 - Content creation (posts, comments)
 - Read access to public content
@@ -628,13 +632,9 @@ if (hasPermission(user, PERMISSIONS.USERS_DELETE)) {
 // ✅ Allow users to edit their own posts OR have permission
 async function updatePost(postId: string, currentUser: User) {
   const post = await getPost(postId);
-  
-  requireOwnershipOrPermission(
-    currentUser,
-    post.authorId,
-    PERMISSIONS.POSTS_UPDATE
-  );
-  
+
+  requireOwnershipOrPermission(currentUser, post.authorId, PERMISSIONS.POSTS_UPDATE);
+
   // Update logic
 }
 ```
@@ -674,12 +674,12 @@ Give users the minimum permissions they need:
 ```typescript
 // ❌ Bad: Too many permissions
 const editorRole = {
-  permissions: ['posts:manage', 'users:manage', 'settings:manage']
+  permissions: ['posts:manage', 'users:manage', 'settings:manage'],
 };
 
 // ✅ Good: Only what's needed
 const editorRole = {
-  permissions: ['posts:create', 'posts:update', 'posts:read']
+  permissions: ['posts:create', 'posts:update', 'posts:read'],
 };
 ```
 
@@ -718,14 +718,10 @@ export const POST = withAuthorization(
 export const PUT = withAuthorization(
   async (request, { user, params }) => {
     const post = await getPost(params.id);
-    
+
     // Can update own posts or have permission
-    requireOwnershipOrPermission(
-      user,
-      post.authorId,
-      BLOG_PERMISSIONS.POSTS_UPDATE
-    );
-    
+    requireOwnershipOrPermission(user, post.authorId, BLOG_PERMISSIONS.POSTS_UPDATE);
+
     // Update post
   },
   { requireAuthenticated: true }
@@ -739,7 +735,7 @@ export const PUT = withAuthorization(
 export const GET = withAuthorization(
   async (request, { user, params }) => {
     const tenantId = params.tenantId;
-    
+
     // Get data
   },
   {
@@ -747,7 +743,7 @@ export const GET = withAuthorization(
     customCheck: async (user) => {
       // Check if user belongs to this tenant
       const tenants = await getUserTenants(user.id);
-      return tenants.some(t => t.id === params.tenantId);
+      return tenants.some((t) => t.id === params.tenantId);
     },
     errorMessage: 'Access denied to this tenant',
   }
@@ -760,17 +756,17 @@ export const GET = withAuthorization(
 // If user has 'manage' permission, they have all CRUD
 function hasEffectivePermission(user: User, permission: string): boolean {
   const [resource, action] = permission.split(':');
-  
+
   // Check explicit permission
   if (user.hasPermission(permission)) {
     return true;
   }
-  
+
   // Check if has 'manage' permission for resource
   if (user.hasPermission(`${resource}:manage`)) {
     return true;
   }
-  
+
   return false;
 }
 ```
@@ -789,9 +785,9 @@ The RBAC system provides:
 ✅ **Production-Ready**: Tested and documented
 
 For more details, see:
+
 - Domain entities: `core/domain/entities/`
 - Repositories: `core/infrastructure/repositories/`
 - Constants: `lib/constants/rbac.constants.ts`
 - Guards: `lib/auth/authorization.ts`
 - Middleware: `lib/auth/with-authorization.ts`
-

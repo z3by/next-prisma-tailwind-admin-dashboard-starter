@@ -22,27 +22,32 @@ By participating in this project, you agree to maintain a respectful and inclusi
 1. **Fork the repository**
 
 2. **Clone your fork**
+
 ```bash
 git clone https://github.com/your-username/next-prisma-tailwind-admin-dashboard-starter.git
 cd next-prisma-tailwind-admin-dashboard-starter
 ```
 
 3. **Install dependencies**
+
 ```bash
 npm install
 ```
 
 4. **Set up environment variables**
+
 ```bash
 cp .env.example .env
 ```
 
 5. **Set up the database**
+
 ```bash
 npx prisma migrate dev
 ```
 
 6. **Run the development server**
+
 ```bash
 npm run dev
 ```
@@ -50,6 +55,7 @@ npm run dev
 ## Development Workflow
 
 1. **Create a new branch** for your feature or bug fix:
+
 ```bash
 git checkout -b feature/your-feature-name
 # or
@@ -59,6 +65,7 @@ git checkout -b fix/your-bug-fix
 2. **Make your changes** following our coding standards
 
 3. **Test your changes**:
+
 ```bash
 npm run test
 npm run lint
@@ -66,11 +73,13 @@ npm run type-check
 ```
 
 4. **Commit your changes** with a descriptive message:
+
 ```bash
 git commit -m "feat: add user profile page"
 ```
 
 5. **Push to your fork**:
+
 ```bash
 git push origin feature/your-feature-name
 ```
@@ -151,6 +160,7 @@ When adding a new feature, follow this order:
 - Keep comments up-to-date
 
 Example:
+
 ```typescript
 /**
  * Creates a new user in the system
@@ -303,4 +313,3 @@ By contributing, you agree that your contributions will be licensed under the MI
 ---
 
 Thank you for contributing! 🎉
-

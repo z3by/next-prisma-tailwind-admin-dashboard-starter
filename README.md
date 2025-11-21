@@ -2,15 +2,18 @@
 
 A production-ready, enterprise-grade admin dashboard starter built with **Next.js 15**, **Prisma**, **Tailwind CSS**, and **Clean Architecture** principles. This starter provides a solid foundation for building scalable admin dashboards with secure authentication, user management, and best practices baked in.
 
+[![CI](https://github.com/yourusername/next-prisma-tailwind-admin-dashboard-starter/workflows/CI/badge.svg)](https://github.com/yourusername/next-prisma-tailwind-admin-dashboard-starter/actions)
 [![Next.js](https://img.shields.io/badge/Next.js-15.x-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
-[![Prisma](https://img.shields.io/badge/Prisma-5.x-2D3748)](https://www.prisma.io/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC)](https://tailwindcss.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-7.x-2D3748)](https://www.prisma.io/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38B2AC)](https://tailwindcss.com/)
+[![Code Style: Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## ✨ Features
 
 ### 🏗️ Architecture & Code Quality
+
 - **Clean Architecture** with clear separation of concerns (Domain, Application, Infrastructure)
 - **Domain-Driven Design (DDD)** principles
 - **SOLID principles** throughout the codebase
@@ -20,6 +23,7 @@ A production-ready, enterprise-grade admin dashboard starter built with **Next.j
 - **Use Cases** for business logic encapsulation
 
 ### 🔐 Authentication & Security
+
 - **NextAuth.js v5** for secure authentication
 - **Password hashing** with bcrypt (configurable salt rounds)
 - **Configurable RBAC System** with fine-grained permissions
@@ -33,6 +37,7 @@ A production-ready, enterprise-grade admin dashboard starter built with **Next.j
 - **Type-safe environment variables** with validation
 
 ### 👥 User Management
+
 - Complete CRUD operations for users
 - User status management (Active, Inactive, Suspended)
 - Role assignment and management
@@ -41,6 +46,7 @@ A production-ready, enterprise-grade admin dashboard starter built with **Next.j
 - Email verification flow
 
 ### 🎨 UI & Styling
+
 - **Tailwind CSS** for utility-first styling
 - **Custom theme** support with CSS variables
 - **Dark mode** ready (infrastructure in place)
@@ -49,6 +55,7 @@ A production-ready, enterprise-grade admin dashboard starter built with **Next.j
 - **Lucide Icons** for consistent iconography
 
 ### 📦 Database
+
 - **Prisma ORM** for type-safe database access
 - **PostgreSQL** as default database (easily switchable)
 - **Migration system** for version control
@@ -56,6 +63,7 @@ A production-ready, enterprise-grade admin dashboard starter built with **Next.j
 - **Connection pooling** configured
 
 ### 🧪 Testing (Structure Ready)
+
 - **Vitest** for unit testing
 - **Testing Library** for component testing
 - Test structure following clean architecture layers
@@ -64,10 +72,20 @@ A production-ready, enterprise-grade admin dashboard starter built with **Next.j
 - Integration test setup
 
 ### 🛠️ Developer Experience
+
 - **Hot Module Replacement** with Fast Refresh
 - **ESLint** configuration with Next.js rules
 - **Prettier** with Tailwind CSS plugin
-- **Husky** for git hooks (optional)
+- **Automated Code Quality**:
+  - Pre-commit hooks with Husky and lint-staged
+  - Auto-format on commit
+  - Type checking before commit
+  - Tests before push
+- **CI/CD with GitHub Actions**:
+  - Automated testing on PRs
+  - Code quality checks
+  - Build verification
+  - Security audits
 - **TypeScript path aliases** for cleaner imports
 - **Comprehensive documentation**
 
@@ -158,6 +176,7 @@ NODE_ENV="development"
 ```
 
 **Generate a secure secret:**
+
 ```bash
 openssl rand -base64 32
 ```
@@ -192,15 +211,20 @@ npm run build            # Build for production
 npm run start            # Start production server
 
 # Database
+npm run db:generate      # Generate Prisma Client
 npm run db:migrate       # Run database migrations
+npm run db:push          # Push schema changes
 npm run db:seed          # Seed database with sample data
 npm run db:studio        # Open Prisma Studio
 npm run db:reset         # Reset database (dangerous!)
 
 # Code Quality
 npm run lint             # Run ESLint
+npm run lint:fix         # Fix ESLint issues
 npm run format           # Format code with Prettier
+npm run format:check     # Check code formatting
 npm run type-check       # TypeScript type checking
+npm run check            # Run all checks (format + lint + type-check)
 
 # Testing
 npm run test             # Run unit tests
@@ -208,27 +232,54 @@ npm run test:watch       # Run tests in watch mode
 npm run test:coverage    # Generate coverage report
 ```
 
+### 🔄 Git Hooks (Automated Quality Checks)
+
+This project uses **Husky** and **lint-staged** to enforce code quality automatically:
+
+**Pre-commit Hook**:
+
+- ✅ Auto-formats code with Prettier
+- ✅ Runs ESLint and auto-fixes issues
+- ✅ Type-checks TypeScript files
+- 📝 Only checks staged files (fast!)
+
+**Pre-push Hook**:
+
+- ✅ Runs all tests
+- 🛡️ Prevents pushing broken code
+
+To skip hooks (not recommended):
+
+```bash
+git commit --no-verify
+git push --no-verify
+```
+
 ## 🏛️ Architecture Overview
 
 This project follows **Clean Architecture** principles with clear separation between layers:
 
 ### Domain Layer (Core Business Logic)
+
 - **Entities**: Encapsulate business rules (e.g., `User`)
 - **Value Objects**: Immutable objects with validation (e.g., `Email`, `Password`)
 - **Repository Interfaces**: Define data access contracts
 - **Domain Errors**: Business-specific exceptions
 
 ### Application Layer (Use Cases)
+
 - **Use Cases**: Orchestrate business logic (e.g., `CreateUserUseCase`)
 - **DTOs**: Data transfer between layers
 - **Ports**: Interfaces for external services
 
 ### Infrastructure Layer (Technical Details)
+
 - **Repository Implementations**: Concrete data access (e.g., `PrismaUserRepository`)
 - **Database Configuration**: Prisma client setup
 - **External Services**: Third-party integrations
 
 ### Presentation Layer (Next.js App)
+
 - **Pages**: Next.js route handlers
 - **Components**: React UI components
 - **API Routes**: RESTful endpoints
@@ -246,6 +297,40 @@ This starter implements enterprise-grade security:
 - ✅ **Session security** with HTTP-only cookies
 - ✅ **Role-based access control** for authorization
 - ✅ **Rate limiting** ready (implementation in progress)
+
+## 🔄 CI/CD Pipeline
+
+### GitHub Actions Workflows
+
+**Main CI Workflow** (`.github/workflows/ci.yml`):
+
+- ✅ Code Quality: Formatting, linting, type-checking
+- ✅ Tests: Unit tests with coverage reports
+- ✅ Build: Production build verification
+- ✅ Security: Dependency vulnerability scanning
+- 🚀 Runs on: Push to main/develop, Pull Requests
+
+**PR Checks Workflow** (`.github/workflows/pr-checks.yml`):
+
+- 📝 PR title format validation
+- 📊 PR size analysis
+- 💬 Commit message linting
+- 📦 Dependency change detection
+
+### Setting Up CI
+
+1. Push your code to GitHub
+2. GitHub Actions will automatically run
+3. Check the "Actions" tab for results
+4. Green checkmarks = good to merge! ✅
+
+### CI Badge
+
+Add to your README (replace `yourusername` and repo name):
+
+```markdown
+[![CI](https://github.com/yourusername/repo-name/workflows/CI/badge.svg)](https://github.com/yourusername/repo-name/actions)
+```
 
 ## 🎨 Styling & Theming
 
@@ -283,6 +368,7 @@ theme: {
 ### Default Database: PostgreSQL
 
 The starter uses PostgreSQL by default, but can be easily switched to:
+
 - MySQL
 - SQLite
 - SQL Server
@@ -292,6 +378,7 @@ The starter uses PostgreSQL by default, but can be easily switched to:
 ### Changing Database Provider
 
 1. Update `prisma/schema.prisma`:
+
 ```prisma
 datasource db {
   provider = "mysql"  // or "sqlite", "sqlserver", etc.
@@ -346,6 +433,7 @@ For more detailed information, see:
 See [PROJECT_PLAN.md](./docs/PROJECT_PLAN.md) for the detailed roadmap.
 
 **Upcoming Features:**
+
 - [ ] Complete authentication UI (login, register, password reset)
 - [ ] User management dashboard
 - [ ] Role management UI
@@ -389,4 +477,4 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 **Made with ❤️ for the developer community**
 
-*Star ⭐ this repository if you find it helpful!*
+_Star ⭐ this repository if you find it helpful!_

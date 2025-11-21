@@ -1,6 +1,7 @@
 import { IPermissionRepository } from '@/core/domain/repositories/permission.repository.interface';
 import { Permission } from '@/core/domain/entities/permission.entity';
 import { prisma } from '../database/prisma';
+import { PrismaPermission } from '@/types/prisma.types';
 
 /**
  * Prisma Permission Repository Implementation
@@ -191,7 +192,7 @@ export class PrismaPermissionRepository implements IPermissionRepository {
   /**
    * Converts Prisma model to Domain entity
    */
-  private toDomain(prismaPermission: any): Permission {
+  private toDomain(prismaPermission: PrismaPermission): Permission {
     return Permission.fromPersistence({
       id: prismaPermission.id,
       name: prismaPermission.name,
@@ -203,4 +204,3 @@ export class PrismaPermissionRepository implements IPermissionRepository {
     });
   }
 }
-

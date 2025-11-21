@@ -59,4 +59,3 @@ export class InvalidOperationError extends DomainError {
     super(message);
   }
 }
-

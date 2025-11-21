@@ -7,21 +7,25 @@ A production-ready Next.js admin dashboard starter with clean architecture, DDD 
 ## 2. Technology Stack
 
 ### Core Framework
+
 - **Next.js 15.x** (App Router with React Server Components)
 - **TypeScript 5.x** (Strict mode)
 - **React 19.x**
 
 ### Database & ORM
+
 - **Prisma 5.x** (Type-safe ORM with migration support)
 - **PostgreSQL** (Default, easily switchable)
 
 ### Authentication & Security
+
 - **NextAuth.js v5** (Authentication for Next.js)
 - **bcryptjs** (Password hashing)
 - **zod** (Runtime validation)
 - **@t3-oss/env-nextjs** (Type-safe environment variables)
 
 ### UI & Styling
+
 - **Tailwind CSS 3.x** (Utility-first CSS)
 - **shadcn/ui** (High-quality React components)
 - **lucide-react** (Icon library)
@@ -29,19 +33,23 @@ A production-ready Next.js admin dashboard starter with clean architecture, DDD 
 - **next-themes** (Dark mode support)
 
 ### State Management & Data Fetching
+
 - **TanStack Query (React Query)** (Server state management)
 - **Zustand** (Client state management - lightweight)
 
 ### Forms & Validation
+
 - **React Hook Form** (Performant forms)
 - **Zod** (Schema validation)
 
 ### Testing
+
 - **Vitest** (Unit testing)
 - **Testing Library** (Component testing)
 - **Playwright** (E2E testing)
 
 ### Code Quality
+
 - **ESLint** (Linting)
 - **Prettier** (Code formatting)
 - **Husky** (Git hooks)
@@ -49,6 +57,7 @@ A production-ready Next.js admin dashboard starter with clean architecture, DDD 
 - **TypeScript** (Type checking)
 
 ### Utilities
+
 - **date-fns** (Date manipulation)
 - **uuid** (Unique identifiers)
 
@@ -97,12 +106,14 @@ src/
 ### Domain-Driven Design Structure
 
 #### Domain Layer (Pure Business Logic)
+
 - **Entities**: User, Role, Permission
 - **Value Objects**: Email, Password, UserId
 - **Domain Events**: UserCreated, UserUpdated, UserDeleted
 - **Repository Interfaces**: Define contracts for data access
 
 #### Application Layer (Use Cases)
+
 - **User Management Use Cases**:
   - CreateUser
   - UpdateUser
@@ -110,7 +121,6 @@ src/
   - GetUser
   - ListUsers
   - AssignRole
-  
 - **Authentication Use Cases**:
   - Login
   - Logout
@@ -119,6 +129,7 @@ src/
   - ResetPassword
 
 #### Infrastructure Layer
+
 - **Prisma Repository Implementations**
 - **NextAuth.js Configuration**
 - **Email Service Integration**
@@ -127,6 +138,7 @@ src/
 ## 4. Core Features
 
 ### Phase 1: Foundation (Week 1)
+
 - [x] Project setup and configuration
 - [ ] Database schema design
 - [ ] Prisma setup with PostgreSQL
@@ -136,6 +148,7 @@ src/
 - [ ] ESLint and Prettier setup
 
 ### Phase 2: Authentication System (Week 1-2)
+
 - [ ] NextAuth.js configuration
 - [ ] User entity and value objects
 - [ ] Authentication use cases
@@ -146,6 +159,7 @@ src/
 - [ ] Role-based access control (RBAC)
 
 ### Phase 3: User Management (Week 2)
+
 - [ ] User domain model
 - [ ] User repository implementation
 - [ ] User CRUD use cases
@@ -156,6 +170,7 @@ src/
 - [ ] User search and filters
 
 ### Phase 4: Dashboard & Layout (Week 2-3)
+
 - [ ] Dashboard layout structure
 - [ ] Sidebar navigation
 - [ ] Header with user menu
@@ -166,6 +181,7 @@ src/
 - [ ] Loading states
 
 ### Phase 5: UI Components & Theme (Week 3)
+
 - [ ] shadcn/ui integration
 - [ ] Custom Tailwind theme
 - [ ] Color system (primary, secondary, accent)
@@ -178,6 +194,7 @@ src/
 - [ ] Toast notifications
 
 ### Phase 6: Testing & Quality (Week 3-4)
+
 - [ ] Unit test setup
 - [ ] Domain entity tests
 - [ ] Use case tests
@@ -186,6 +203,7 @@ src/
 - [ ] Critical path E2E tests
 
 ### Phase 7: Documentation (Week 4)
+
 - [ ] Architecture documentation
 - [ ] API documentation
 - [ ] Component documentation
@@ -209,10 +227,10 @@ model User {
   status        UserStatus @default(ACTIVE)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  
+
   sessions      Session[]
   accounts      Account[]
-  
+
   @@map("users")
 }
 
@@ -229,9 +247,9 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@unique([provider, providerAccountId])
   @@map("accounts")
 }
@@ -241,9 +259,9 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@map("sessions")
 }
 
@@ -287,6 +305,7 @@ enum UserStatus {
 ## 8. Development Workflow
 
 ### Setup
+
 ```bash
 npm install
 npm run db:setup
@@ -295,6 +314,7 @@ npm run dev
 ```
 
 ### Database Commands
+
 ```bash
 npm run db:migrate     # Run migrations
 npm run db:seed        # Seed database
@@ -303,6 +323,7 @@ npm run db:reset       # Reset database
 ```
 
 ### Testing
+
 ```bash
 npm run test           # Run unit tests
 npm run test:e2e       # Run E2E tests
@@ -310,6 +331,7 @@ npm run test:coverage  # Generate coverage
 ```
 
 ### Code Quality
+
 ```bash
 npm run lint           # Run ESLint
 npm run format         # Run Prettier
@@ -319,17 +341,20 @@ npm run type-check     # TypeScript check
 ## 9. Deployment Strategy
 
 ### Recommended Platforms
+
 - **Vercel** (Best for Next.js)
 - **Railway** (Good for database)
 - **Supabase** (PostgreSQL hosting)
 
 ### Environment Variables
+
 - Database URL
 - NextAuth secret and URL
 - Email service credentials
 - Storage service credentials
 
 ### CI/CD
+
 - GitHub Actions workflow
 - Automated testing
 - Automated deployment
@@ -366,4 +391,3 @@ npm run type-check     # TypeScript check
 **Estimated Timeline**: 3-4 weeks for MVP
 **Team Size**: 1-2 developers
 **Maintenance**: Active community support and regular updates
-
