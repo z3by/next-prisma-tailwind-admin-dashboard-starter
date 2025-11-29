@@ -1,10 +1,41 @@
 'use client';
 
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Menu } from 'lucide-react';
+import { useState } from 'react';
+
+export default function MobileSidebar() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon" className="md:hidden">
+          <Menu />
+          <span className="sr-only">Toggle Menu</span>
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="p-0">
+        <div className="h-full px-0 py-0">
+          {/* Reuse Sidebar content or create a specific mobile nav */}
+          {/* Since Sidebar component has 'hidden md:flex', we might need to adjust it 
+                or create a shared Nav component. 
+                For now, I'll just render a simplified nav here or try to reuse Sidebar if I modify it to accept className.
+            */}
+          <SidebarContent />
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+// Duplicating logic for now to avoid modifying Sidebar too much to handle "hidden" class.
+// Ideally, we extract the Nav items to a config or shared component.
 import { Link, usePathname } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { LayoutDashboard, Users, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
-import { Button } from '@/components/ui/button';
 
 const sidebarItems = [
   {
@@ -19,13 +50,13 @@ const sidebarItems = [
   },
 ];
 
-export default function Sidebar() {
+function SidebarContent() {
   const t = useTranslations('Dashboard');
   const tUsers = useTranslations('UserManagement');
   const pathname = usePathname();
 
   return (
-    <aside className="bg-card text-card-foreground hidden w-64 flex-col border-r md:flex">
+    <div className="bg-card text-card-foreground flex h-full flex-col">
       <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <span className="">Admin Dashboard</span>
@@ -57,6 +88,6 @@ export default function Sidebar() {
           Settings
         </Button>
       </div>
-    </aside>
+    </div>
   );
 }

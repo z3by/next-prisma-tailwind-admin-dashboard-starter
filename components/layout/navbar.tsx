@@ -1,23 +1,26 @@
 import LanguageSwitcher from '../language-switcher';
-import { signOut } from '@/auth';
+import { UserNav } from './user-nav';
+import { ThemeToggle } from '../theme-toggle';
+import MobileSidebar from './mobile-sidebar';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
 
 export default function Navbar() {
   return (
-    <header className="flex items-center justify-between bg-white p-4 shadow">
-      <div>{/* Breadcrumbs or Title could go here */}</div>
-      <div className="flex items-center space-x-4">
+    <header className="bg-background sticky top-0 z-30 flex h-14 items-center gap-4 border-b px-4 shadow-sm sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+      <MobileSidebar />
+      <div className="relative ml-auto flex-1 md:grow-0">
+        <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
+        <Input
+          type="search"
+          placeholder="Search..."
+          className="bg-background w-full rounded-lg pl-8 md:w-[200px] lg:w-[320px]"
+        />
+      </div>
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
         <LanguageSwitcher />
-        <form
-          action={async () => {
-            'use server';
-            await signOut();
-          }}
-        >
-          <button type="submit" className="text-sm text-red-600 hover:text-red-800">
-            Sign Out
-          </button>
-        </form>
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">U</div>
+        <UserNav />
       </div>
     </header>
   );

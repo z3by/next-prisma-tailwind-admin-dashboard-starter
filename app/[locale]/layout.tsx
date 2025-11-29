@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '../../i18n/routing';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '../globals.css';
+import { ThemeProvider } from '@/components/theme-provider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -33,9 +34,18 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider messages={messages}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
