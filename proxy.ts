@@ -4,7 +4,7 @@ import { auth } from '@/auth';
 
 const intlMiddleware = createMiddleware(routing);
 
-export default auth((req) => {
+export const proxy = auth((req) => {
   const { pathname } = req.nextUrl;
 
   // Check if the user is accessing a dashboard route
