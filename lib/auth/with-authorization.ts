@@ -11,6 +11,8 @@ import {
   requireAdmin,
   requireSuperAdmin,
 } from './authorization';
+import { auth } from '@/auth';
+import { PrismaUserRepository } from '@/core/infrastructure/repositories/prisma-user.repository';
 
 /**
  * Authorization Configuration
@@ -90,10 +92,22 @@ export function withAuthorization(
 ): (request: NextRequest, context?: { params?: Record<string, string> }) => Promise<Response> {
   return async (request: NextRequest, context?: { params?: Record<string, string> }) => {
     try {
-      // TODO: Get user from session (integrate with NextAuth)
-      // For now, we'll assume user is in request context
-      // In practice, this would be extracted from session/token
-      const user = (request as unknown as { user?: User }).user as User | null;
+      // Get user from session
+      const session = await auth();
+
+      if (!session?.user?.id) {
+        return NextResponse.json(
+          {
+            error: 'Authentication required',
+            message: 'You must be logged in to access this resource',
+          },
+          { status: 401 }
+        );
+      }
+
+      // Get full user entity with roles and permissions
+      const userRepository = new PrismaUserRepository();
+      const user = await userRepository.findById(session.user.id);
 
       if (!user) {
         return NextResponse.json(

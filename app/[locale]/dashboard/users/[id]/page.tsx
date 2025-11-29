@@ -13,7 +13,7 @@ export default async function EditUserPage({ params }: { params: Promise<{ id: s
   let user;
   try {
     user = await useCase.execute(id);
-  } catch (e) {
+  } catch {
     notFound();
   }
 
