@@ -12,6 +12,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { signOutAction } from '@/app/actions/auth';
 
 export function UserNav() {
   return (
@@ -49,13 +50,7 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={async () => {
-            // We need to handle this client-side or use a server action wrapper
-            // For now, we'll just use the form approach or similar if needed,
-            // but since this is a client component (likely), we might need to call a server action.
-            // The original navbar used a form.
-            // Let's assume we can call signOut here if it's imported from next-auth/react or similar.
-            // But the import is from '@/auth' which might be server-side only.
-            // I'll leave it as a TODO or use a simple form wrapper if I can.
+            await signOutAction();
           }}
         >
           Log out
