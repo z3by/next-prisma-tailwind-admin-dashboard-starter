@@ -21,6 +21,7 @@
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset",
+    "create-admin": "ts-node -r tsconfig-paths/register scripts/create-admin.ts",
     "prepare": "husky",
     "check": "npm run format:check && npm run lint && npm run type-check"
   },
@@ -66,6 +67,8 @@
     "prettier-plugin-prisma": "^5.0.0",
     "prettier-plugin-tailwindcss": "^0.7.1",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5",
     "vitest": "^4.0.14"
   },
