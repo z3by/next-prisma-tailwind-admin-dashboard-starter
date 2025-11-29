@@ -11,7 +11,7 @@ export const proxy = auth((req) => {
   const isDashboard = pathname.includes('/dashboard');
 
   if (isDashboard && !req.auth) {
-    const signInUrl = new URL('/api/auth/signin', req.nextUrl.origin);
+    const signInUrl = new URL('/auth/signin', req.nextUrl.origin);
     signInUrl.searchParams.set('callbackUrl', req.url);
     return Response.redirect(signInUrl);
   }
@@ -21,5 +21,5 @@ export const proxy = auth((req) => {
 
 export const config = {
   // Match only internationalized pathnames
-  matcher: ['/', '/(ar|en)/:path*'],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 };
