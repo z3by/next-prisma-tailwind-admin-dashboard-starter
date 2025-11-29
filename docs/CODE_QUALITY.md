@@ -43,9 +43,6 @@ When you run `git commit`, the following checks run **automatically** on staged 
 **Husky Hook** (`.husky/pre-commit`):
 
 ```bash
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 npx lint-staged
 ```
 
@@ -118,9 +115,6 @@ When you run `git push`, all tests run automatically:
 **Husky Hook** (`.husky/pre-push`):
 
 ```bash
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 echo "🧪 Running tests before push..."
 
 npm run test
@@ -701,9 +695,6 @@ npm run build
 Create `.husky/commit-msg`:
 
 ```bash
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Check commit message format
 commit_msg=$(cat "$1")
 
