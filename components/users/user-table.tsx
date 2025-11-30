@@ -4,7 +4,7 @@ import { UserResponseDto } from '@/core/application/dtos/user.dto';
 import { useTranslations } from 'next-intl';
 import { Edit, Trash2 } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import { deleteUser } from '@/app/actions/users';
+import { UserService } from '@/lib/services/user.service';
 import { useTransition } from 'react';
 import {
   Table,
@@ -29,7 +29,8 @@ export default function UserTable({ users }: UserTableProps) {
   const handleDelete = (id: string) => {
     if (confirm(tCommon('confirmDelete'))) {
       startTransition(async () => {
-        await deleteUser(id);
+        await UserService.getInstance().deleteUser(id);
+        window.location.reload(); // Refresh to update list
       });
     }
   };

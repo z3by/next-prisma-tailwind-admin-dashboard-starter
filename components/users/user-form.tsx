@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { useTransition } from 'react';
-import { createUser, updateUser } from '@/app/actions/users';
+import { UserService } from '@/lib/services/user.service';
 import { UserResponseDto } from '@/core/application/dtos/user.dto';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,13 +56,15 @@ export default function UserForm({ user }: UserFormProps) {
   const onSubmit = (data: FormData) => {
     startTransition(async () => {
       try {
+        const userService = UserService.getInstance();
         if (user) {
-          await updateUser(user.id, data);
+          await userService.updateUser(user.id, data);
         } else {
           if (!data.password) return; // Password required for create
-          await createUser({ ...data, password: data.password });
+          await userService.createUser({ ...data, password: data.password });
         }
         router.push('/dashboard/users');
+        router.refresh(); // Refresh to ensure data is updated
       } catch (error) {
         console.error(error);
         alert('An error occurred');

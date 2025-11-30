@@ -1,8 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
-import { signInAction } from '@/app/actions/auth';
+import { AuthService } from '@/lib/services/auth.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,29 +12,36 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button className="w-full" type="submit" disabled={pending}>
-      {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      Sign In
-    </Button>
-  );
-}
 
 export function SignInForm() {
-  const [errorMessage, dispatch] = useActionState(signInAction, undefined);
-
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>Enter your email below to login to your account.</CardDescription>
       </CardHeader>
-      <form action={dispatch}>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.currentTarget);
+          const email = formData.get('email') as string;
+          const password = formData.get('password') as string;
+
+          const authService = AuthService.getInstance();
+          const success = await authService.login(email, password);
+
+          if (success) {
+            window.location.href = '/dashboard';
+          } else {
+            // We can't easily set error message with useActionState if we bypass it.
+            // For simplicity in this hybrid mode, we'll use a local state for error.
+            // But wait, we can't mix useActionState easily with client-side logic if we want to keep server action for Prisma mode.
+            // Actually, AuthService handles both modes.
+            // So we should just use a client-side handler that calls AuthService.
+            alert('Invalid credentials');
+          }
+        }}
+      >
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
@@ -46,10 +51,11 @@ export function SignInForm() {
             <Label htmlFor="password">Password</Label>
             <Input id="password" name="password" type="password" required />
           </div>
-          {errorMessage && <p className="text-destructive text-sm">{errorMessage}</p>}
         </CardContent>
         <CardFooter>
-          <SubmitButton />
+          <Button className="w-full" type="submit">
+            Sign In
+          </Button>
         </CardFooter>
       </form>
     </Card>

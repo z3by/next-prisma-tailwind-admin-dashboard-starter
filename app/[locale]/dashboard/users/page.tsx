@@ -1,12 +1,21 @@
 import { getUsers } from '@/app/actions/users';
-import UserTable from '@/components/users/user-table';
+import UserListContainer from '@/components/users/user-list-container';
 import { Link } from '@/i18n/routing';
 import { getTranslations } from 'next-intl/server';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+import { UserResponseDto } from '@/core/application/dtos/user.dto';
+
 export default async function UsersPage() {
-  const { users } = await getUsers();
+  let users: UserResponseDto[] = [];
+
+  // Only fetch on server if NOT using browser storage
+  if (process.env.NEXT_PUBLIC_REPOSITORY_PROVIDER !== 'browser') {
+    const result = await getUsers();
+    users = result.users;
+  }
+
   const t = await getTranslations('UserManagement');
 
   return (
@@ -20,7 +29,7 @@ export default async function UsersPage() {
           </Link>
         </Button>
       </div>
-      <UserTable users={users} />
+      <UserListContainer initialUsers={users} />
     </div>
   );
 }
